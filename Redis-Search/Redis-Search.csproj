@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Redis_Search</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.66" />
+    <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="8.0.5" />
+    <PackageReference Include="StackExchange.Redis.Extensions.Newtonsoft" Version="8.0.5" />
+    <PackageReference Include="NRediSearch" Version="2.2.79" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="StackExchange.Redis" />
+    <None Remove="StackExchange.Redis.Extensions.AspNetCore" />
+    <None Remove="StackExchange.Redis.Extensions.Newtonsoft" />
+    <None Remove="NRediSearch" />
+    <None Remove="Services\" />
+    <None Remove="Models\" />
+    <None Remove="Serialization\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="Models\" />
+    <Folder Include="Serialization\" />
+  </ItemGroup>
+</Project>
