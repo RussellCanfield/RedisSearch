@@ -1,13 +1,10 @@
 ﻿using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.Newtonsoft;
-using StackExchange.Redis.Extensions.Core.Abstractions;
-using StackExchange.Redis;
 using System.Text.Json;
 using Redis_Search;
-using NRediSearch;
 using Redis_Search.Services;
 using Redis_Search.Models;
-using SearchResult = Redis_Search.Models.SearchResult;
+using Redis_Search_Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +26,8 @@ builder.Services.AddSingleton(sp =>
 });
 
 builder.Services.AddSingleton<Hasher>();
+
+builder.Services.AddSingleton<ISearchService, SearchService>();
 
 var app = builder.Build();
 

@@ -1,8 +1,6 @@
-﻿using System;
-using Redis_Search.Models;
+﻿using Redis_Search.Models;
 using StackExchange.Redis;
 using StackExchange.Redis.Extensions.Core.Abstractions;
-using StackExchange.Redis.Extensions.Core.Implementations;
 
 namespace Redis_Search.Services
 {
@@ -74,12 +72,14 @@ namespace Redis_Search.Services
                 if (hasFuzzySearch)
                     keys.Add(searchCacheKey);
 
-                var weights = new double[keys.ToArray().Length];
+                var redisKeys = keys.ToArray();
+
+                var weights = new double[redisKeys.Length];
                 Array.Fill(weights, 1);
 
                 var setResult = batch.SortedSetCombineAndStoreAsync(SetOperation.Intersect,
                     cacheKey,
-                    keys.ToArray(),
+                    redisKeys,
                     weights);
 
                 batch.KeyExpireAsync(cacheKey, TimeSpan.FromSeconds(120));
