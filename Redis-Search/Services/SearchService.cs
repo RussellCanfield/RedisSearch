@@ -38,12 +38,11 @@ namespace Redis_Search.Services
             if (hasFuzzySearch)
             {
                 var searchQuery = SearchQuery.Create(redisDb.Database, "indexes:vehicles");
-                var results = await searchQuery.Find(searchRequest.Text);
-                searchQuery.Store(results, searchCacheKey);
+                await searchQuery.FindAndStore(searchCacheKey, searchRequest.Text);
             }
 
-            if (!await redisDb.ExistsAsync(cacheKey) &&
-                searchRequest.Facets.Length > 0)
+            if (searchRequest.Facets.Length > 0 &&
+                !await redisDb.ExistsAsync(cacheKey))
             {
                 var batch = redisDb.Database.CreateBatch();
 

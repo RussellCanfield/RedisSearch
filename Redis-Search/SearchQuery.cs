@@ -20,17 +20,22 @@ namespace Redis_Search.Services
             return new SearchQuery(database, new Client(index, database));
         }
 
-        public async Task<SearchResult> Find(string input, int offset = 0, int limit = 10000)
+        public async Task FindAndStore(string key, string input, double expiryInSeconds = 120, int offset = 0, int limit = 10000)
         {
+            if (await _database.KeyExistsAsync(key))
+            {
+                await _database.KeyExpireAsync(key, TimeSpan.FromSeconds(expiryInSeconds));
+                return;
+            }
+
             var query = new Query(input);
             query.Limit(offset, limit);
 
-            return await _client.SearchAsync(query);
-        }
+            var searchResult = await _client.SearchAsync(query);
 
-        public void Store(SearchResult searchResult, string key)
-        {
             var searchBatch = _database.CreateBatch();
+
+            IList<Task> tasks = new List<Task>(searchResult.Documents.Count);
 
             for (var i = 0; i < searchResult.Documents.Count; i++)
             {
@@ -38,11 +43,13 @@ namespace Redis_Search.Services
 
                 var d = searchResult.Documents[i].Id.AsSpan().Slice(lastIndex + 1).ToString();
 
-                searchBatch.SortedSetAddAsync(key, d, i);
-                searchBatch.KeyExpireAsync(key, TimeSpan.FromSeconds(120));
+                tasks.Add(searchBatch.SortedSetAddAsync(key, d, i));
+                tasks.Add(searchBatch.KeyExpireAsync(key, TimeSpan.FromSeconds(120)));
             }
 
             searchBatch.Execute();
+
+            await Task.WhenAll(tasks);
         }
     }
 }
